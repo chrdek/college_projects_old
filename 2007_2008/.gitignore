@@ -1,0 +1,9 @@
+#Ignore Backups, zip and other files
+*.zip
+*.ZIP
+*.bak
+*.BAK
+*.OBJ
+*.obj
+*.doc
+*.DOC

@@ -1,0 +1,19 @@
+CREATE TRIGGER date_sync
+BEFORE INSERT OR UPDATE ON cust_car
+
+  DECLARE ErrorDate EXCEPTION;
+
+BEGIN
+
+IF INSERTING OR UPDATING THEN
+ IF (:new.date_ended_ownership < :new.date_begun_ownership) THEN
+  RAISE ErrorDate;
+
+ END IF;
+END IF;
+
+EXCEPTION
+WHEN ErrorDate THEN
+  RAISE_APPLICATION_ERROR(-20326,'ERROR INSERTING/UPDATING DATE(s)!');
+	
+END;

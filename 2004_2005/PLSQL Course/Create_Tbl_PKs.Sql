@@ -1,0 +1,52 @@
+PROMPT CREATING TABLE CUSTOMERS
+CREATE TABLE customers
+(
+cust_num NUMBER		NOT NULL PRIMARY KEY,
+cust_name VARCHAR2(30) NOT NULL,
+cust_address VARCHAR2(50),
+amount_owed NUMBER(16,2),
+date_deactivated DATE
+)
+;
+
+PROMPT CREATING TABLE CUST_CAR
+CREATE TABLE cust_car
+(
+cust_num	NUMBER	NOT NULL REFERENCES customers(cust_num)
+ON DELETE CASCADE,
+car_num		NUMBER	NOT NULL REFERENCES cars(car_num)
+ON DELETE CASCADE,
+date_begun_ownership	DATE,
+date_ended_ownership	DATE
+)
+;
+
+PROMPT CREATING TABLE OVER_CREDIT_LIMIT
+CREATE TABLE over_credit_limit
+(
+cust_num	NUMBER	NOT NULL REFERENCES customers(cust_num)
+ON DELETE CASCADE,
+date_occured	DATE,
+amount_over_limit INTEGER
+)
+;
+
+PROMPT ADDING PRIMARY CONSTRAINT TO CUST_CAR TABLE
+ALTER TABLE over_credit_limit ADD
+(
+CONSTRAINT over_credit_limit_pk
+PRIMARY KEY (cust_num,date_occured)
+)
+;
+
+PROMPT ADDING PRIMARY CONSTRAINT TO CUST_CAR TABLE
+ALTER TABLE cust_car ADD
+(
+CONSTRAINT cust_car_pk
+PRIMARY KEY (cust_num,car_num)
+)
+;
+
+PROMPT CREATING SEQUENCE CUSTOMER_SEQUENCE
+CREATE SEQUENCE customer_sequence
+START WITH 1 INCREMENT BY 1;

@@ -1,0 +1,91 @@
+   Help On The Bankers Algorithm Pascal Simulator:
+   ----------------------------------------------
+Bankers Algorithm Simulator
+(c)Copyright 2004-2005 all rights reserved
+=========================================================
+
+Brief Explanation Of the Bankers Algorithm:
+-------------------------------------------
+
+The Bankers Algorithm is Divided to four steps:
+
+***********************************
+*Take as given the following data:*
+***********************************
+N=Maximum Number of Processes
+M=Maximum Number of Resources
+
+<AVAIL. RESOURCE VECTOR> ---> OF SIZE 1*M
+
+A Max Matrix[] ---> OF SIZE N*M
+
+An Allocation Matrix[] ---> OF SIZE N*M
+
+
+<Pn REQUEST VECTOR> ---> OF SIZE 1*M
+
+Where:
+Pn=Process Number
+
+Step1:
+------
+First, determine whether a request for a resource allocation has been granted
+In Step 1, we check:
+  If Request(n) <= Need(n) and Proceed to Step 2
+  
+ELSE
+
+We terminate process Pn since it has exceeded it's maximum resource claim.
+
+
+Step2:
+------
+At Step 2, we check again whether we have enough resources for the request
+For Example:
+   If Request(n) <= Available(n) Then Proceed to Step 3
+
+ELSE
+
+We terminate process Pn since resources are not yet available and therefore Pn has
+to wait.
+
+
+Step3:
+------
+At Step 3, we pretend first we have allocated the requested resources to Pn process
+In pascal coding this is done likewise:
+
+Available[i]:=Available[i]-Request[i];
+Allocation[i,j]:=Allocation[i,j]+Request[i];
+Need[i,j]:=Need[i,j]-Request[i];
+
+And then the Safety Algorithm is applied which also has 4 more steps to follow:
+
+1.Initialize
+     a)Work=Available
+     b)Finish[i]=False for i to N     (ex:for N=4 finishvector=<F,F,F,F>)
+
+2.Find an i such that:
+     a)Finish[i]=False
+     b)Need<=Work
+If such i does not exist go to step4 else move on to step3.
+
+3.Work=Work+Allocation
+  Finish[i]=True
+Repeat step2 until all Finish[i]=True Then go to step4
+
+4.If Finish[i]=True Then THE SYTSTEM IS IN A SAFE STATE
+
+ELSE
+
+THE SYSTEM IS IN AN UNSAFE STATE
+
+
+Step4:
+------
+In Step 4 of the Bankers Algorithm, the outcome of the Safety Algorithm is revised and if 
+the systems is indeed in a safe state then the transaction is completed.
+
+ELSE
+
+The process Pn must wait and the old state is restored.
