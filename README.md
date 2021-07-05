@@ -29,7 +29,7 @@
 &nbsp;
 &nbsp;
 
-     Update [05/06/2021 @ ]: Gathered what I could find/build and included it in a DOSBOX runner (included in "Releases") so you can test some of the programs functionality.
+     Update [05/06/2021 @02f5d77]: Gathered what I could find/build and included it in a DOSBOX runner (included in "Releases") so you can test some of the programs functionality.
      
      Extract default contents of DOSbox.zip to install dir of %ProgramFiles(x86)%\DosBox-0.74.
      Move folders with executables in C:\DOSBOX.
