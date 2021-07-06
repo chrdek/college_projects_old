@@ -1,0 +1,197 @@
+       IDENTIFICATION  DIVISION.
+       PROGRAM-ID. LAB1OLD.
+       AUTHOR. STUDENT 1
+       DATE-WRITTEN. 20/10/2003.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. LAB-PC.
+       OBJECT-COMPUTER. LAB-PC.
+
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+       SELECT IN-FILE1 ASSIGN TO DISK
+       ORGANIZATION IS LINE SEQUENTIAL.
+       SELECT IN-FILE2 ASSIGN TO DISK
+       ORGANIZATION IS LINE SEQUENTIAL.
+       SELECT OUT-FILE ASSIGN TO DISK
+       ORGANIZATION IS LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD IN-FILE1
+       LABEL RECORDS ARE STANDARD
+       VALUE OF FILE-ID IS "STUDENT.TXT"
+       RECORD CONTAINS 80 CHARACTERS.
+
+       01 STUDENTS-RECORD.
+          05 ST-ID PIC X(6).
+          05 ST-LN PIC X(15).
+          05 ST-FN PIC X(10).
+          05 ST-CLASS PIC X(3).
+          05 SEX-IN PIC X.
+          05 FILLER PIC X(45).
+
+       FD IN-FILE2
+       LABEL RECORDS ARE STANDARD
+       VALUE OF FILE-ID IS "STUDENT2.TXT"
+       RECORD CONTAINS 80 CHARACTERS.
+
+       01 STUDENTS-RECORD2.
+          05 STUD-ID PIC X(6).
+          05 GRADES-1 PIC 999 OCCURS 5 TIMES.
+          05 GRADES-2 PIC 999 OCCURS 5 TIMES.
+          05 FILLER PIC X(44).
+
+       FD OUT-FILE
+       LABEL RECORDS ARE STANDARD
+       VALUE OF FILE-ID IS "FINOUT.TXT"
+       RECORD CONTAINS 133 CHARACTERS.
+
+       01 OUT-RECORD.
+          05 OUT-ID PIC X(6).
+          05 FILLER PIC X(5).
+          05 OUT-LN PIC X(15).
+          05 FILLER PIC X(5).
+          05 OUT-FN PIC X(10).
+          05 FILLER PIC X(5).
+          05 OUT-CLASS PIC X(3).
+          05 FILLER PIC X(5).
+          05 OUT-SEX PIC X(6).
+          05 FILLER PIC X(5).
+          05 GRADES-YR1 PIC 999 OCCURS 5 TIMES.
+          05 FILLER PIC X(5).
+          05 OUTAV-YR1 PIC ZZ9.99.
+          05 FILLER PIC X(11).
+          05 GRADES-YR2 PIC 999 OCCURS 5 TIMES.
+          05 FILLER PIC X(5).
+          05 OUTAV-YR2 PIC ZZ9.99.
+          05 FILLER PIC X(5).
+
+       WORKING-STORAGE SECTION.
+          01 GENERAL-VARS.
+             05 END-OF-FILE PIC X VALUE "0".
+             05 I PIC 9 VALUE 1.
+             05 J PIC 9 VALUE 1.
+             05 TOT-GRADES1 PIC 999 VALUE 0.
+             05 TOT-GRADES2 PIC 999 VALUE 0.
+             05 AVERAGE-YR1 PIC 9(3)V99 VALUE 0.
+             05 AVERAGE-YR2 PIC 9(3)V99 VALUE 0.
+
+          01 GENDER PIC X.
+             88 FEMALE VALUE "F","f".
+             88 MALE VALUE "M","m".
+
+          01 WS-ARRAY.
+             05 ID-NUM PIC 9(6) OCCURS 9 TIMES INDEXED BY IND.
+             05 SIZE-1 OCCURS 2 TIMES.
+              10 SIZE-2  OCCURS 5 TIMES.
+               15 YEAR-GRD PIC 999.
+
+          01 HEAD-1.
+             05 FILLER PIC X(10) VALUE "STUDENT-ID".
+             05 FILLER PIC X(5) VALUE SPACES.
+             05 FILLER PIC X(9) VALUE "LAST-NAME".
+             05 FILLER PIC X(6) VALUE SPACES.
+             05 FILLER PIC X(10) VALUE "FIRST-NAME".
+             05 FILLER PIC X(5) VALUE SPACES.
+             05 FILLER PIC X(5) VALUE "CLASS".
+             05 FILLER PIC X(5) VALUE SPACES.
+             05 FILLER PIC X(3) VALUE "SEX".
+             05 FILLER PIC X(5) VALUE SPACES.
+             05 FILLER PIC X(12) VALUE "GRADES-YEAR1".
+             05 FILLER PIC X(5) VALUE SPACES.
+             05 FILLER PIC X(15) VALUE "AVER-GRADE YR-1".
+             05 FILLER PIC X(5) VALUE SPACES.
+             05 FILLER PIC X(12) VALUE "GRADES-YEAR2".
+             05 FILLER PIC X(5) VALUE SPACES.
+             05 FILLER PIC X(15) VALUE "AVER-GRADE YR-2".
+
+
+          01 HEAD-2.
+             05 FILLER PIC X(133) VALUE ALL "-".
+
+       PROCEDURE DIVISION.
+       MAIN-ROUTINE.
+           PERFORM OPEN-FILES.
+           PERFORM CREATE-HEADERS.
+           PERFORM READ-DATA.
+           PERFORM CREATE-REPORTS
+                   UNTIL END-OF-FILE = "1".
+           PERFORM CLOSE-FILES.
+
+
+       OPEN-FILES.
+           OPEN INPUT IN-FILE1.
+           OPEN INPUT IN-FILE2.
+           OPEN OUTPUT OUT-FILE.
+
+
+       CREATE-HEADERS.
+           WRITE OUT-RECORD FROM HEAD-1
+           MOVE SPACES TO OUT-RECORD.
+           WRITE OUT-RECORD FROM HEAD-2
+           MOVE SPACES TO OUT-RECORD.
+
+
+       READ-DATA.
+           READ IN-FILE1 AT END
+                MOVE "1" TO END-OF-FILE.
+           READ IN-FILE2 AT END
+                MOVE "1" TO END-OF-FILE.
+
+       CREATE-REPORTS.
+           SET IND TO 1.
+           MOVE ST-ID TO OUT-ID.
+           MOVE ST-LN TO OUT-LN.
+           MOVE ST-FN TO OUT-FN.
+           MOVE ST-CLASS TO OUT-CLASS.
+           MOVE SEX-IN TO GENDER.
+
+           IF FEMALE MOVE "FEMALE" TO OUT-SEX
+            ELSE
+             MOVE "MALE" TO OUT-SEX.
+             MOVE 0 TO TOT-GRADES1.
+             MOVE 0 TO TOT-GRADES2.
+             MOVE STUD-ID TO ID-NUM(IND).
+
+             SEARCH ID-NUM AT END
+             WHEN ID-NUM(IND) = STUD-ID
+             PERFORM FIND-AVERAGE1 VARYING I
+                FROM 1 BY 1 UNTIL I>1
+                AFTER J FROM 1 BY 1 UNTIL J>5
+
+             PERFORM FIND-AVERAGE2 VARYING I
+                FROM 1 BY 1 UNTIL I>1
+                AFTER J FROM 1 BY 1 UNTIL J>5.
+
+             READ IN-FILE1 AT END
+                MOVE "1" TO END-OF-FILE.
+             READ IN-FILE2 AT END
+                MOVE "1" TO END-OF-FILE.
+
+             WRITE OUT-RECORD.
+             MOVE SPACES TO OUT-RECORD.
+
+
+       FIND-AVERAGE1.
+           MOVE GRADES-1(J) TO YEAR-GRD(1,J).
+           ADD YEAR-GRD(1,J) TO TOT-GRADES1.
+           DIVIDE TOT-GRADES1 BY 5 GIVING AVERAGE-YR1.
+           MOVE YEAR-GRD(1,J) TO GRADES-YR1(J).
+           MOVE AVERAGE-YR1 TO OUTAV-YR1.
+           MOVE 0 TO AVERAGE-YR1.
+
+       FIND-AVERAGE2.
+           MOVE GRADES-2(J) TO YEAR-GRD(2,J).
+           ADD YEAR-GRD(2,J) TO TOT-GRADES2.
+           DIVIDE TOT-GRADES2 BY 5 GIVING AVERAGE-YR2.
+           MOVE YEAR-GRD(2,J) TO GRADES-YR2(J).
+           MOVE AVERAGE-YR2 TO OUTAV-YR2.
+           MOVE 0 TO AVERAGE-YR2.
+
+       CLOSE-FILES.
+           CLOSE IN-FILE1.
+           CLOSE IN-FILE2.
+           CLOSE OUT-FILE.
+           STOP RUN.
